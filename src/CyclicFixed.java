@@ -17,9 +17,9 @@ public class CyclicFixed extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises CyclicFixed instance vars
-	public CyclicFixed(String name, Meter meter, int unitsConsumed, int period) throws Exception
+	public CyclicFixed(String name, int unitsConsumed, int period) throws Exception
 	{
-		super(name, meter);
+		super(name);
 		this.unitsConsumed = unitsConsumed;
 		//presumes initialised at start of 24hr day; will not have run for any amount of time yet
 		this.timeOn = 0;
@@ -65,7 +65,8 @@ public class CyclicFixed extends Appliance
 		try
 		{
 			//create testApp (unit consumption 6 units/hr and 3/24 hr ontime)
-			CyclicFixed testApp = new CyclicFixed("test", meter, 6, 3);
+			CyclicFixed testApp = new CyclicFixed("test", 6, 3);
+			testApp.setMeter(meter);
 			//should show all readings at 0
 			meter.report();
 			
@@ -91,7 +92,7 @@ public class CyclicFixed extends Appliance
 			meter.report();
 			
 			//invalid constructor, should throw exception
-			CyclicFixed testApp2 = new CyclicFixed("test2", meter, 6, 25);
+			CyclicFixed testApp2 = new CyclicFixed("test2", 6, 25);
 		}
 		//catch any thrown Exception
 		catch (Exception ex)

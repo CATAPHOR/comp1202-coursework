@@ -17,11 +17,10 @@ public abstract class Appliance
 	 * METHODS
 	 */
 	
-	//constructor, initialises Appliance properties
-	public Appliance(String name, Meter meter)
+	//constructor, initialises Appliance's name
+	public Appliance(String name)
 	{
 		this.name = name;
-		this.setMeter(meter);
 	}
 	
 	//public setter method for the appliance's meter

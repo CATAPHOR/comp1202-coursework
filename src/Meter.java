@@ -44,7 +44,7 @@ public class Meter
 		System.out.println("\n====METER REPORT====");
 		System.out.println("Utility: " + this.utilityName);
 		System.out.println("Meter Reading (units): " + this.meterReading);
-		System.out.println("Cost: " + cost);
+		System.out.println("Cost (£): " + cost);
 		
 		//reset meterReading to 0
 		this.meterReading = 0f;
