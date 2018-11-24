@@ -1,15 +1,15 @@
-//inherits Appliance, an appliance with fixed use cycle and unit consumption during each day
+//inherits Appliance, an Appliance with fixed use cycle and unit consumption during each day
 public class CyclicFixed extends Appliance
 {
 	/*
 	 * PROPERTIES
 	 */
 	
-	//fixed number of units consumed by appliance per hour
+	//fixed number of units consumed by Appliance per hour
 	private int unitsConsumed;
-	//number of hours per day (1 - 24) appliance is active
+	//number of hours per day (1 - 24) Appliance is active
 	private int cycleLength;
-	//number of timePasses() called within a day (i.e. hours appliance on since day start)
+	//number of timePasses() called within a day (i.e. hours Appliance on since day start)
 	private int timeOn;
 	
 	/*
@@ -17,38 +17,38 @@ public class CyclicFixed extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises CyclicFixed instance vars
-	public CyclicFixed(String name, int unitsConsumed, int period) throws Exception
+	public CyclicFixed(String name, int unitsConsumed, int cycleLength) throws Exception
 	{
 		super(name);
 		this.unitsConsumed = unitsConsumed;
 		//presumes initialised at start of 24hr day; will not have run for any amount of time yet
 		this.timeOn = 0;
 		
-		//check 1 hour <= period <= 24 hours, throw Exception if not
-		if (period > 0 && period < 25)
+		//check 1 hour <= cycleLength <= 24 hours, throw Exception if not
+		if (cycleLength > 0 && cycleLength < 25)
 		{
-			this.cycleLength = period;
+			this.cycleLength = cycleLength;
 		}
 		else
 		{
-			throw new Exception("Period must be 1 - 24 hours.");
+			throw new Exception("Cycle length must be 1 - 24 hours.");
 		}
 	}
 	
-	//define CyclicFixed behaviour within hour time increments
+	//defines CyclicFixed behaviour within an hour time increment
 	public void timePasses()
 	{
-		//only run appliance for specified period within a day
-		if (this.timeOn < cycleLength)
+		//only run Appliance for specified period within a day
+		if (this.timeOn < this.cycleLength)
 		{
-			this.tellMeterToConsumeUnits(unitsConsumed);
+			this.tellMeterToConsumeUnits(this.unitsConsumed);
 		}
 		
 		//increment timeOn; if day concludes (timeOn = 24), then reset to 0
-		timeOn++;
-		if (timeOn == 24)
+		this.timeOn++;
+		if (this.timeOn == 24)
 		{
-			timeOn = 0;
+			this.timeOn = 0;
 		}
 	}
 	
@@ -93,6 +93,7 @@ public class CyclicFixed extends Appliance
 			
 			//invalid constructor, should throw exception
 			CyclicFixed testApp2 = new CyclicFixed("test2", 6, 25);
+			testApp2.timePasses();
 		}
 		//catch any thrown Exception
 		catch (Exception ex)

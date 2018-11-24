@@ -8,9 +8,9 @@ public abstract class Appliance
 	 * PROPERTIES
 	 */
 	
-	//name of appliance
+	//name of Appliance
 	private String name;
-	//Meter instance used by appliance to monitor its utility consumption
+	//Meter instance used by Appliance to monitor its utility consumption
 	private Meter meter;
 	
 	/*
@@ -23,18 +23,24 @@ public abstract class Appliance
 		this.name = name;
 	}
 	
-	//public setter method for the appliance's meter
+	//public getter method for the Appliance's name
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	//public setter method for the Appliance's meter
 	public void setMeter(Meter meter)
 	{
 		this.meter = meter;
 	}
 	
-	//protected method for meter to register consumed units from appliance
+	//protected method for meter to register consumed units from Appliance
 	protected void tellMeterToConsumeUnits(int i)
 	{
 		this.meter.consumeUnits(i);
 	}
 	
-	//abstract method for what an appliance does within a time increment (1 hour)
+	//abstract method for what an Appliance does within a time increment (1 hour)
 	public abstract void timePasses();
 }
