@@ -36,9 +36,9 @@ public abstract class Appliance
 	}
 	
 	//protected method for meter to register consumed units from Appliance
-	protected void tellMeterToConsumeUnits(int i)
+	protected void tellMeterToConsumeUnits(float f)
 	{
-		this.meter.consumeUnits(i);
+		this.meter.consumeUnits(f);
 	}
 	
 	//abstract method for what an Appliance does within a time increment (1 hour)

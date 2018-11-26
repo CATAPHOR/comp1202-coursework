@@ -9,7 +9,7 @@ public class RandomFixed extends Appliance
 	 */
 	
 	//fixed number of units consumed by Appliance per hour
-	private int unitsConsumed;
+	private float unitsConsumed;
 	//defines probability (1 in switchOn) that Appliance will be turned on
 	private int switchOnP;
 	//Random object to be used to generate random numbers
@@ -20,7 +20,7 @@ public class RandomFixed extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises RandomFixed instance vars
-	public RandomFixed(String name, int unitsConsumed, int switchOnP)
+	public RandomFixed(String name, float unitsConsumed, int switchOnP)
 	{
 		super(name);
 		this.unitsConsumed = unitsConsumed;

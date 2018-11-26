@@ -9,7 +9,7 @@ public class RandomVaries extends Appliance
 	 */
 	
 	//min and max number of units that can be consumed in an hour by Appliance
-	private int minUnits, maxUnits;
+	private float minUnits, maxUnits;
 	//defines probability (1 in switchOn) that Appliance will be turned on
 	private int switchOnP;
 	//Random object to be used to generate random numbers
@@ -20,7 +20,7 @@ public class RandomVaries extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises RandomVaries instance vars
-	public RandomVaries(String name, int minUnits, int maxUnits, int switchOnP)
+	public RandomVaries(String name, float minUnits, float maxUnits, int switchOnP)
 	{
 		super(name);
 		
@@ -54,8 +54,11 @@ public class RandomVaries extends Appliance
 		 */
 		if (this.random.nextInt(this.switchOnP) == 0)
 		{
-			//nextInt() returns int between minUnits and maxUnits, tells Meter to consume this number of units
-			this.tellMeterToConsumeUnits(this.random.nextInt(this.maxUnits - this.minUnits + 1) + this.minUnits);
+			/*
+			 * nextFloat() returns float between 0.0 and 1.0, (max - min) * float + min gives a random float
+			 * between min and max, tells Meter to consume this quantity of units
+			 */
+			this.tellMeterToConsumeUnits((this.maxUnits - this.minUnits) * this.random.nextFloat() + this.minUnits);
 		}
 	}
 	

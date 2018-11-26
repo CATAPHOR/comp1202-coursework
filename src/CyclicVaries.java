@@ -9,7 +9,7 @@ public class CyclicVaries extends Appliance
 	 */
 	
 	//min and max number of units that can be consumed in an hour by Appliance
-	private int minUnits, maxUnits;
+	private float minUnits, maxUnits;
 	//number of hours per day (1 - 24) Appliance is active
 	private int cycleLength;
 	//number of timePasses() called within a day (i.e. hours Appliance on since day start)
@@ -22,7 +22,7 @@ public class CyclicVaries extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises CyclicVaries instance vars
-	public CyclicVaries(String name, int minUnits, int maxUnits, int cycleLength) throws Exception
+	public CyclicVaries(String name, float minUnits, float maxUnits, int cycleLength) throws Exception
 	{
 		super(name);
 		
@@ -64,8 +64,11 @@ public class CyclicVaries extends Appliance
 		//only run Appliance for specified period within a day
 		if (this.timeOn < this.cycleLength)
 		{
-			//nextInt() returns int between minUnits and maxUnits, tells Meter to consume this number of units
-			this.tellMeterToConsumeUnits(this.random.nextInt(this.maxUnits - this.minUnits + 1) + this.minUnits);
+			/*
+			 * nextFloat() returns float between 0.0 and 1.0, (max - min) * float + min gives a random float
+			 * between min and max, tells Meter to consume this quantity of units
+			 */
+			this.tellMeterToConsumeUnits((this.maxUnits - this.minUnits) * this.random.nextFloat() + this.minUnits);
 		}
 				
 		//increment timeOn; if day concludes (timeOn = 24), then reset to 0

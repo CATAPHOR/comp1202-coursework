@@ -6,7 +6,7 @@ public class CyclicFixed extends Appliance
 	 */
 	
 	//fixed number of units consumed by Appliance per hour
-	private int unitsConsumed;
+	private float unitsConsumed;
 	//number of hours per day (1 - 24) Appliance is active
 	private int cycleLength;
 	//number of timePasses() called within a day (i.e. hours Appliance on since day start)
@@ -17,7 +17,7 @@ public class CyclicFixed extends Appliance
 	 */
 	
 	//constructor, calls Appliance constructor and initialises CyclicFixed instance vars
-	public CyclicFixed(String name, int unitsConsumed, int cycleLength) throws Exception
+	public CyclicFixed(String name, float unitsConsumed, int cycleLength) throws Exception
 	{
 		super(name);
 		this.unitsConsumed = unitsConsumed;

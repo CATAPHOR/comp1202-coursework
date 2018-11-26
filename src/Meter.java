@@ -6,11 +6,11 @@ public class Meter
 	 */
 	
 	//describes type of utility monitored
-	private String utilityName;
+	protected String utilityName;
 	//cost of one unit of this type of utility in £
-	private double unitCost;
+	protected double unitCost;
 	//holds balance of units of utility used by appliance since last meter reading
-	private float meterReading;
+	protected float meterReading;
 	
 	/*
 	 * CONSTRUCTORS
@@ -29,9 +29,9 @@ public class Meter
 	 */
 	
 	//adjust meterReading as per how many units of a utility are consumed
-	public void consumeUnits(int i)
+	public void consumeUnits(float f)
 	{
-		this.meterReading += i;
+		this.meterReading += f;
 	}
 	
 	//generate report from current state of Meter properties, return calculated cost in £
