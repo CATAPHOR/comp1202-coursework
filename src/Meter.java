@@ -37,16 +37,12 @@ public class Meter
 	//generate report from current state of Meter properties, return calculated cost in £
 	public double report()
 	{	
-		//calculate cost of total metered utility usage, if meterReading negative then cost = 0
-		double cost;
+		//calculate cost of total metered utility usage, if meterReading negative or 0 then cost = 0
+		double cost = 0;
 		
 		if (this.meterReading > 0)
 		{
 			cost = this.meterReading * this.unitCost;
-		}
-		else
-		{
-			cost = 0;
 		}
 		
 		//print report of utility name, reading, and cost
@@ -72,7 +68,7 @@ public class Meter
 		//create Meter object
 		Meter elecMeter = new Meter("Electricity", 0.013);
 		
-		//should report 5 units, then 0
+		//should report() 5 units, then 0
 		elecMeter.consumeUnits(10);
 		elecMeter.consumeUnits(-5);
 		elecMeter.report();
