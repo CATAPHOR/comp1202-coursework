@@ -6,7 +6,7 @@ public class BatteryMeter extends Meter
 	 */
 	
 	//battery object declared to which the Meter shall be linked
-	Battery battery;
+	private Battery battery;
 	
 	/*
 	 * METHODS

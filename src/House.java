@@ -15,23 +15,20 @@ public class House
 	private Meter waterMeter, electricMeter;
 	//ArrayList of all appliances within the House
 	private ArrayList<Appliance> applianceList;
+	//ConfigReader to read from config txt file and add Appliances accordingly
+	private ConfigReader configReader;
 	
 	/*
 	 * METHODS
 	 */
 	
-	//constructor, assigns new Meter objects to instance var references
+	//constructor with no parameters, calls this() with default Meter objects as references
 	public House()
 	{
-		//create Meter objects and assign them to this House
-		this.electricMeter = new Meter("electricity", 0.013);
-		this.waterMeter = new Meter("water", 0.002);
-		
-		//create the Appliance ArrayList
-		this.applianceList = new ArrayList<>();
+		this(new Meter("electricity", 0.013), new Meter("water", 0.002));
 	}
 	
-	//overloaded constructor where Meter object references are taken as arguments
+	//constructor where Meter object references are taken as arguments
 	public House(Meter electricMeter, Meter waterMeter)
 	{
 		//assign Meter arguments to the House's Meters
@@ -60,6 +57,15 @@ public class House
 	public void removeAppliance(Appliance appliance)
 	{
 		this.applianceList.remove(appliance);
+	}
+	
+	//retrieves Appliance ArrayList from config file using ConfigReader methods
+	public void addConfigAppliances(String filename) throws Exception
+	{
+		//initialise ConfigReader instance with filename of config file
+		this.configReader = new ConfigReader(filename);
+		//return ArrayList from getAppliances (passing House's Meters as arguments), set to House's applianceList
+		this.applianceList = configReader.getAppliances(this.electricMeter, this.waterMeter);
 	}
 	
 	//returns the number of Appliances within the House (applianceList)
@@ -115,36 +121,37 @@ public class House
 	//main method to test House functionality
 	public static void main(String[] args)
 	{
-		//try-catch to catch any exceptions thrown by invalid input
+		//try-catch to catch any Exceptions thrown
 		try
 		{
-			
 			//create House object
-			House house = new House();
-			//print number of Appliances in House, should be 0
-			System.out.println(house.numAppliances());
+			House house = new House(new BatteryMeter("electricity", 0.013, 5), new Meter("water", 0.002));
 			
-			//assign Appliances
-			house.addElectricAppliance(new CyclicFixed("Lights", 6, 5));
-			house.addElectricAppliance(new CyclicFixed("Fridge", 2, 24));
-			house.addWaterAppliance(new RandomVaries("Shower", 1, 2, 1));
+			/*
+			 * RUN SIMULATION
+			 */
 			
-			//print number of Appliances in House, should be 3
-			System.out.println(house.numAppliances());
-			
-			//run one activate(), should print two reports then total cost
-			System.out.println("\nTotal cost (£): " + house.activate());
-			
-			
-			System.out.println("\nHouse 2:");
-			
-			//testing BatteryMeter as constructor parameter:
-			House house2 = new House(new BatteryMeter("electricity", 0.013, 5), new Meter("water", 0.002));
-			
-			//assign Appliances, set so that generator sometimes outpaces consumption
-			house2.addElectricAppliance(new CyclicFixed("Lights", 6, 5));
-			house2.addElectricAppliance(new RandomVaries("Wind Turbine", -1, -25, 2));
-			System.out.println("\nTotal cost (£): " + house2.activate(24));
+			//more than one command line argument invalid -- throws Exception
+			if (args.length > 1)
+			{
+				throw new Exception("No more than 1 argument can be passed to command line.");
+			}
+			//if one argument given on command line, it is passed as the filename to addConfigAppliances()
+			else if (args.length == 1)
+			{
+				house.addConfigAppliances(args[0]);
+				for (int i = 0; i < 7; i++)
+				{
+					System.out.println("\n\n======DAY " + (i + 1) + "======\n");
+					System.out.println("\nDay cost (£): " + house.activate(24));
+				}
+			}
+			//if no argument given, defaults to attempting to read a "myHouse.txt" file
+			else
+			{
+				house.addConfigAppliances("myHouse.txt");
+				System.out.println("\nTotal cost (£): " + house.activate(24));
+			}
 		}
 		catch (Exception ex)
 		{
