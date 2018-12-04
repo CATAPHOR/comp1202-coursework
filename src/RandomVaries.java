@@ -63,6 +63,31 @@ public class RandomVaries extends Appliance
 	}
 	
 	/*
+	 * EXTENSION METHODS
+	 */
+	
+	/*
+	 * getter methods for Appliance properties
+	 */
+	//return maximum number of units consumed
+	public float getMaxUnits()
+	{
+		return this.maxUnits;
+	}
+	
+	//return minimum number of units consumed
+	public float getMinUnits()
+	{
+		return this.minUnits;
+	}
+	
+	//return probability of appliance turning on
+	public int getProbability()
+	{
+		return this.switchOnP;
+	}
+	
+	/*
 	 * MAIN
 	 */
 	

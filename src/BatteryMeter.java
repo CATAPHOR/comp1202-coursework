@@ -63,6 +63,37 @@ public class BatteryMeter extends Meter
 	}
 	
 	/*
+	 * EXTENSION METHODS
+	 */
+	
+	//method to store units in Battery on saved simulation (in config file) to Battery
+	public void loadBatteryStore(float f) throws Exception
+	{
+		//throw Exception if attempt is made to load more units than the Battery's capacity; else run method
+		if (f <= this.battery.capacityLimit)
+		{
+			this.battery.storeUnits(Math.abs(f));
+		}
+		else
+		{
+			throw new Exception("Stored units value, " + f + ", exceeds maximum Battery capacity, " +
+		+ this.battery.capacityLimit + ".");
+		}
+	}
+	
+	//getter method to battery capacity (units)
+	public float getBatteryCap()
+	{
+		return this.battery.capacityLimit;
+	}
+	
+	//getter method for currently stored units in battery
+	public float getBatteryStore()
+	{
+		return this.battery.capacityLimit;
+	}
+	
+	/*
 	 * MAIN
 	 */
 	

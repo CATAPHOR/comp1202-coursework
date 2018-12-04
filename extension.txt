@@ -1,17 +1,17 @@
 SAVESTATE
 
-hour:
-total cost:
-battery store:
+hour:12
+total cost:2.34
+battery store:1.25
 
 METERS
 
-name: electricity
-unit cost: 0.013
-batteryCap: 2.0
+name:electricity
+unit cost:0.013
+battery cap:2.0
 
-name: water
-unit cost: 0.002
+name:water
+unit cost:0.002
 
 APPLIANCES
 

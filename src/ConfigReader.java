@@ -1,9 +1,4 @@
-/*
- * ACADEMIC INTEGRITY DISCLAIMER:
- * This class reuses/recycles some of the functions I defined in my COMP1202 Lab 9 FlashCardReader class.
- */
-
-//necessary reading of the text file
+//necessary for reading of the text file
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
@@ -282,16 +277,16 @@ public class ConfigReader
 			//read line from file
 			line = this.getLine();
 			//begin block if line read is the "name: electricity" header
-			if (line.equals("name: electricity"))
+			if (line.equals("name:electricity"))
 			{
 				//set the next two getLine contents, sans prefix, to the property Strings
-				unitCost = this.getLine().replace("unit cost: ", "");
-				batteryCap = this.getLine().replaceAll("batteryCap: ", "");
+				unitCost = this.getLine().replace("unit cost:", "");
+				batteryCap = this.getLine().replaceAll("battery cap:", "");
 				
 				try
 				{
-					//naive electricity Meters have an empty string after the "batteryCap:" prefix; call Meter()
-					if (batteryCap.equals("batteryCap:"))
+					//naive electricity Meters have an empty string after the "battery cap:" prefix; call Meter()
+					if (batteryCap.equals(""))
 					{
 						return new Meter("electricity", Double.parseDouble(unitCost));
 					}
@@ -309,7 +304,7 @@ public class ConfigReader
 			}
 		}
 		
-		//if program reaches this point it has not returned a Meter; no valid electric Meter defined in file
+		//if method reaches this point it has not returned a Meter; no valid electric Meter defined in file
 		throw new Exception("No valid Electricity Meter defined in config file.");
 	}
 	
@@ -326,10 +321,10 @@ public class ConfigReader
 			//read line from file
 			line = this.getLine();
 			//begin block if line read is the "name: water" header
-			if (line.equals("name: water"))
+			if (line.equals("name:water"))
 			{
 				//set the next two getLine contents, sans prefix, to the property Strings
-				unitCost = this.getLine().replace("unit cost: ", "");
+				unitCost = this.getLine().replace("unit cost:", "");
 				
 				try
 				{
@@ -343,7 +338,7 @@ public class ConfigReader
 			}
 		}
 		
-		//if program reaches this point it has not returned a Meter; no valid water Meter defined in file
+		//if method reaches this point it has not returned a Meter; no valid water Meter defined in file
 		throw new Exception("No valid Water Meter defined in config file.");
 	}
 	
@@ -356,6 +351,59 @@ public class ConfigReader
 		this.reader = new BufferedReader(new FileReader(filename));
 		
 		return isExtensionFormat;
+	}
+	
+	//method to load SAVESTATE contents in Extension file format
+	public String[] loadSave() throws Exception
+	{
+		//create return String[] to contain Strings for hour, total cost, and battery store
+		String[] saveState = new String[3];
+		String line, hour, totalCost, batteryStore;
+		line = hour = totalCost = batteryStore = "";
+		
+		//runs while fileIsReady() is true (ready to read valid textual input)
+		while (fileIsReady())
+		{
+			//read line from file
+			line = this.getLine();
+			//begin block if line read is the "SAVESTATE" header
+			if (line.equals("SAVESTATE"))
+			{
+				//skip empty lines
+				do
+				{
+					line = this.getLine();
+				} while(line.equals(""));
+				
+				//set the next three getLine contents, with prefix, to the property Strings
+				hour = line;
+				totalCost = this.getLine();
+				batteryStore = this.getLine();
+				
+				//verify the input from file has been correctly formatted
+				if (hour.contains("hour:") && totalCost.contains("total cost:") && 
+						batteryStore.contains("battery store:"))
+				{
+					//attempt to place strings holding only the values in saveState then return
+					try
+					{
+						saveState[0] = hour.replace("hour:", "");
+						saveState[1] = totalCost.replace("total cost:", "");
+						saveState[2] = batteryStore.replace("battery store:", "");
+						
+						return saveState;
+					}
+					//if try block fails, arguments must have been invalid; throw Exception
+					catch (Exception ex)
+					{
+						throw new Exception("SAVESTATE data invalid in config file.");
+					}
+				}
+			}
+		}
+		
+		//if method reaches this point it has not returned a Meter; no valid water Meter defined in file
+		throw new Exception("No valid SAVESTATE contents found in config file.");
 	}
 	
 	/*
@@ -387,6 +435,7 @@ public class ConfigReader
 			
 			//EXTENSION
 			ConfigReader cfrEx = new ConfigReader("extension.txt");
+			cfrEx.loadSave();
 			cfrEx.getElectricMeter();
 			
 			//create ConfigReader from invalid file

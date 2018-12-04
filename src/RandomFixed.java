@@ -44,6 +44,25 @@ public class RandomFixed extends Appliance
 	}
 	
 	/*
+	 * EXTENSION METHODS
+	 */
+	
+	/*
+	 * getter methods for Appliance properties
+	 */
+	//return fixed number of units consumed
+	public float getFixedUnits()
+	{
+		return this.unitsConsumed;
+	}
+	
+	//return probability of appliance turning on
+	public int getProbability()
+	{
+		return this.switchOnP;
+	}
+	
+	/*
 	 * MAIN
 	 */
 	

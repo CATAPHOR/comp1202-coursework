@@ -8,8 +8,8 @@
 
 	Part 7:	The method by which config-defined Appliances are added to the House's ArrayList will
 		never assign an Appliance incorrectly (given the config entry has its Meter listed).
-		As such, there is no need to handle Exceptions, as suggested in the specification, for 
-		incorrect Meter-type assignment.
+		As such, there is no need to handle the specific Exception suggested in specification 
+		(incorrect Meter-type assignment).
 
 -	RUNNING THE MAIN METHOD:
 
@@ -39,7 +39,7 @@
 	
 	Upon running the program, it will prompt the user as to whether they wish to enable Extension
 	Mode; giving "Y" will throw an exception if a config file isn't specified (i.e. extension.txt);
-	myHouse.txt is the default and is RESERVED for non-Extension Mode.
+	myHouse.txt is the default and is reserved for non-Extension Mode.
 
 -	EXTENSIONS:
 	
@@ -50,18 +50,55 @@
 		thrown for invalid data. If one Appliance is incorrectly defined the Exception will
 		contain its name (if it is salvageable). Numerous other cases accounted for.
 	
-	-	MAIN EXTENSION ATTEMPT:
-		Using "extension.txt" as separate config file. Running the m
-		Config File extended:
-		 
-		SAVESTATE contains last hour run in activate(), the Battery's
-		stored units, and the total cost accumulated over the hours simulated. This allows
-		for the state of a House after running a simulation to be saved and resumed to and
-		from the extended config file. (NOT YET IMPLEMENTED)
+	-	MAIN EXTENSION - LOADING from any config file and SAVING config to "save.txt":
+
+
+		To enable extension functionality, a command line config file argument MUST be 
+		specified and it MUST NOT be myHouse.txt, as this file is reserved for non-Extension
+		Mode use.
 		
+		To this end, an example "extension.txt" has been included in the directory, from which
+		the extension can be demonstrated as intended if passed as arg[0].
+
+
+		CONFIG FILE EXTENDED FORMAT SPECIFICATION:
+		
+		3 line headers (defined here all caps) precede the following sections in the file:
+		
+		SAVESTATE contains last hour run in activate(), the Battery's stored units, and the
+		total cost accumulated over the hours simulated. This allows for the state of a House
+		after running a simulation to be saved and resumed to and from an extended-type config
+		file.
+
 		METERS contains the properties for the Meter objects, meaning that in Extension Mode
 		the House's Electricity and Water Meters are initialised based on the values given
 		in the config file.
 
-		ConfigReader and House's main() had to undergo significant changes to accommodate
-		the extended features as well as the default, non-extended feature set.
+		APPLIANCES contain the appliance definitions; identical to format of appliances in
+		myHouse.txt.
+
+		[ConfigReader and House's main() had to undergo significant changes to accommodate
+		the extended features as well as the default, non-extended feature set.]
+
+
+		LOADING FUNCTIONALITY:
+		
+		The config file to be loaded must be specified as arg[0]. Supplied in the directory
+		is extension.txt, though if a House state has been saved it is ideal to pass
+		"save.txt".
+		
+		The program will begin by asking the user for Y/N input as to whether they wish
+		to enable extension function. If so, main() uses ConfigReader's extended functions
+		to supply arguments to an overloaded activate() from which the simulation will run
+		as if continuing from that which is saved.
+		
+
+		SAVING FUNCTIONALITY:
+		If extension mode is on, it will prompt the user to, if they choose, save their
+		session to "save.txt" after the simulation has ended. The saved file has full LOAD
+		functionality; i.e. loading save.txt the next time you run allows you to resume your
+		previous simulation. The format of save.txt is of the Extended Mode type, but this is 
+		backward compatible (i.e. you can pass save.txt as arg[0] for non-Extended Mode, though
+		this will obviously only inform what the House's Appliances will be). Any previous
+		save.txt contents are overwritten in the process.
+		

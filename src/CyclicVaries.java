@@ -80,6 +80,37 @@ public class CyclicVaries extends Appliance
 	}
 	
 	/*
+	 * EXTENSION METHODS
+	 */
+	
+	//sets timeOn to passed integer -- useful if running from extended config file
+	public void setTime(int n)
+	{
+		this.timeOn = (n % 24);
+	}
+	
+	/*
+	 * getter methods for Appliance properties
+	 */
+	//return maximum number of units consumed
+	public float getMaxUnits()
+	{
+		return this.maxUnits;
+	}
+	
+	//return minimum number of units consumed
+	public float getMinUnits()
+	{
+		return this.minUnits;
+	}
+	
+	//return cycle length
+	public int getCycleLength()
+	{
+		return this.cycleLength;
+	}
+	
+	/*
 	 * MAIN
 	 */
 	
