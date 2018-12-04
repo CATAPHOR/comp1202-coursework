@@ -49,10 +49,11 @@ public class BatteryMeter extends Meter
 		}
 		
 		//print report of current units in Battery and power drawn from it, the meterReading (mains reading), and cost
-		System.out.println("Current Battery Store (units): " + this.battery.unitsStored + "/" + this.battery.capacityLimit);
-		System.out.println("Battery Power Drawn (units): " + batteryPower);
-		System.out.println("Mains Meter Reading (units): " + this.meterReading);
-		System.out.println("Cost (£): " + cost);
+		System.out.println("Battery Power Drawn (units): " + String.format("%.2f", batteryPower));
+		System.out.println("Mains Meter Reading (units): " + String.format("%.2f", this.meterReading));
+		System.out.println("Current Battery Store (units): " + String.format("%.2f", this.battery.unitsStored) + "/" 
+				+ String.format("%.2f", this.battery.capacityLimit));
+		System.out.println("Cost (\u00A3): " + String.format("%.2f", cost));
 		
 		//reset meterReading to 0
 		this.meterReading = 0f;

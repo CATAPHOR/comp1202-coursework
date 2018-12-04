@@ -35,6 +35,12 @@ public abstract class Appliance
 		this.meter = meter;
 	}
 	
+	//getter method for Appliance's Meter, useful for verifying it has been properly set
+	public Meter getMeter()
+	{
+		return this.meter;
+	}
+	
 	//protected method for meter to register consumed units from Appliance
 	protected void tellMeterToConsumeUnits(float f)
 	{

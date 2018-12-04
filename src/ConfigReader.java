@@ -25,6 +25,8 @@ public class ConfigReader
 	private ArrayList<Appliance> applianceArray;
 	//meters (passed to ConfigReader by House) to be used when registering Appliance instances
 	private Meter electricMeter, waterMeter;
+	//filename for EXTENSION, checking whether the file is of custom Extension format
+	private String filename;
 	
 	/*
 	 * METHODS
@@ -33,10 +35,12 @@ public class ConfigReader
 	//constructor, takes filename parameter as String to initialise reader
 	public ConfigReader(String filename)
 	{
+		this.filename = filename;
+		
 		try
 		{
 			//set input stream as a FileReader of the text file specified in filename
-			this.reader = new BufferedReader(new FileReader(filename));
+			this.reader = new BufferedReader(new FileReader(this.filename));
 		}
 		catch (FileNotFoundException ex)
 		{
@@ -98,21 +102,38 @@ public class ConfigReader
 		String applianceProperties = "";
 		String line = "";
 		
+		//run this block if the first line is SAVESTATE, i.e. if it is of custom EXTENSION format
+		if (checkExtension())
+		{
+			//skip through lines until the line is "APPLIANCES", the header for the Appliance section of the file
+			do
+			{
+				line = this.getLine();
+			} while (!line.equals("APPLIANCES"));
+		}
+		
 		//runs while fileIsReady() is true (ready to read valid textual input)
 		while (fileIsReady())
 		{
-			//sets line to getLine(), ignores the empty lines between each appliance in the config file
-			while (!(line = this.getLine()).equals(""))
+			
+			//if file ready, sets line to getLine(), ignores the empty lines between each appliance in the config file
+			while (fileIsReady() && !(line = this.getLine()).equals(""))
 			{
 				//add the lines for each of the Appliance properties, delimited by ";", to the temporary String
 				applianceProperties += line + ";";
+				
+				//breaks on last line to ensure Appliances read if no empty line between them in config file
+				if (line.contains("Cycle length:"))
+				{
+					break;
+				}
 			}
 			
 			//prevent passing of invalid applianceProperties Strings to getAppliance() method
-			if (!applianceProperties.equals("") && applianceProperties.split(";").length == 8)
+			if (!applianceProperties.equals(""))
 			{
 				//add use getAppliance() to generate Appliance from non-empty String, add this to the applianceArray
-				this.applianceArray.add(this.getAppliance(applianceProperties));
+				this.applianceArray.add(this.getAppliance(applianceProperties.split(";")));
 			}
 			
 			//reset temporary string
@@ -130,39 +151,83 @@ public class ConfigReader
 	}
 	
 	//method to return an Appliance instance generated from the properties described in a String parameter
-	public Appliance getAppliance(String input) throws Exception
+	public Appliance getAppliance(String[] input) throws Exception
 	{
 		//initialise Appliance object to return, and declare vars to store each of input's property substrings
 		Appliance appliance = null;
 		String name, subclass, meter, minu, maxu, fixu, prob, cycle;
 		
-		//all Appliance varieties have names, subclasses, and meters -- initialise and strip config prefixes
-		name = input.split(";")[0].replace("name: ", "");
-		subclass = input.split(";")[1].replace("subclass: ", "");
-		meter = input.split(";")[2].replace("meter: ", "");
+		//name set to UNDETERMINED by default, if input[0] formatted correctly it is set to Appliance's name
+		name = "UNDETERMINED";
+		if (input[0].contains("name: "))
+		{
+			name = input[0].replace("name: ", "");
+		}
+		
+		//define Exception for invalid input format (using Appliance name if input[0] was correctly formatted)
+		Exception invalidInput = new Exception("Invalid data in config file, entry: " + name);
+		
+		//input String[] must be of length 8 -- defining the state of the 8 possible Appliance properties
+		if (input.length != 8)
+		{
+			throw invalidInput;
+		}
+		
+		//check all 8 required properties are present in the input
+		boolean checkFormat = input[0].contains("name: ") && input[1].contains("subclass: ") && 
+				input[2].contains("meter: ") && input[3].contains("Min units consumed:") && 
+				input[4].contains("Max units consumed:") && input[5].contains("Fixed units consumed:") &&
+				input[6].contains("Probability switched on:") && input[7].contains("Cycle length:");
+		
+		//if checkFormat is not true, input is invalid -- throw Exception
+		if (!checkFormat)
+		{
+			throw invalidInput;
+		}
+		
+		//all Appliance varieties have subclasses and meters -- initialise and strip config prefixes
+		subclass = input[1].replace("subclass: ", "");
+		meter = input[2].replace("meter: ", "");
+		
+		//check that property strings common to all Appliances aren't empty
+		if (name.equals("") || subclass.equals("") || meter.equals(""))
+		{
+			throw invalidInput;
+		}
+		
 		//set unique property Strings to be initially empty
 		minu = maxu = fixu = prob = cycle = "";
 		
 		//Cyclic-type Appliances have "X/24" cycle lengths property; extract "X" from input
 		if (subclass.contains("Cyclic"))
 		{
-			cycle = input.split(";")[7].replace("Cycle length: ", "").replace("/24", "");
+			cycle = input[7].replace("Cycle length: ", "").replace("/24", "");
 		}
 		//Random-type Appliances have "1 in X" probability property; extract "X" from input
 		if (subclass.contains("Random"))
 		{
-			prob = input.split(";")[6].replace("Probability switched on: ", "").replace("1 in ", "");
+			prob = input[6].replace("Probability switched on: ", "").replace("1 in ", "");
 		}
 		//Varies-type Appliances have min and max unit properties; extract these from input
 		if (subclass.contains("Varies"))
 		{
-			minu = input.split(";")[3].replace("Min units consumed: ", "");
-			maxu = input.split(";")[4].replace("Max units consumed: ", "");
+			minu = input[3].replace("Min units consumed: ", "");
+			maxu = input[4].replace("Max units consumed: ", "");
 		}
 		//Fixed-type Appliances have fixed unit consumption property; extract this from input
 		if (subclass.contains("Fixed"))
 		{
-			fixu = input.split(";")[5].replace("Fixed units consumed: ", "");
+			fixu = input[5].replace("Fixed units consumed: ", "");
+		}
+		
+		//use checkFormat to check if subclass String is one of the four defined Appliance variants
+		checkFormat = subclass.equals("CyclicFixed") || subclass.equals("CyclicVaries") || 
+				subclass.equals("RandomFixed") || subclass.equals("RandomVaries");
+		
+		//if subclass does not contain a String corresponding to a valid class, throw Exception
+		if (!checkFormat)
+		{
+			throw invalidInput;
 		}
 		
 		/*
@@ -201,6 +266,99 @@ public class ConfigReader
 	}
 	
 	/*
+	 * EXTENSION METHODS
+	 */
+
+	//method to load electric Meter from saved custom config file format
+	public Meter getElectricMeter() throws Exception
+	{
+		//define Strings for Meter properties, set each to empty string ""
+		String line, unitCost, batteryCap;
+		line = unitCost = batteryCap = "";
+		
+		//runs while fileIsReady() is true (ready to read valid textual input)
+		while (fileIsReady())
+		{
+			//read line from file
+			line = this.getLine();
+			//begin block if line read is the "name: electricity" header
+			if (line.equals("name: electricity"))
+			{
+				//set the next two getLine contents, sans prefix, to the property Strings
+				unitCost = this.getLine().replace("unit cost: ", "");
+				batteryCap = this.getLine().replaceAll("batteryCap: ", "");
+				
+				try
+				{
+					//naive electricity Meters have an empty string after the "batteryCap:" prefix; call Meter()
+					if (batteryCap.equals("batteryCap:"))
+					{
+						return new Meter("electricity", Double.parseDouble(unitCost));
+					}
+					//otherwise a value is given for the batteryCap and is passed to BatteryMeter() constructor
+					else
+					{
+						return new BatteryMeter("electricity", Double.parseDouble(unitCost), Float.parseFloat(batteryCap));
+					}
+				}
+				//if constructor Meter() failed, arguments must have been invalid; throw Exception
+				catch (Exception ex)
+				{
+					throw new Exception("Electricity Meter data invalid in config file.");
+				}
+			}
+		}
+		
+		//if program reaches this point it has not returned a Meter; no valid electric Meter defined in file
+		throw new Exception("No valid Electricity Meter defined in config file.");
+	}
+	
+	//method to load electric Meter from saved custom config file format
+	public Meter getWaterMeter() throws Exception
+	{
+		//define Strings for Meter properties, set each to empty string ""
+		String line, unitCost;
+		line = unitCost = "";
+		
+		//runs while fileIsReady() is true (ready to read valid textual input)
+		while (fileIsReady())
+		{
+			//read line from file
+			line = this.getLine();
+			//begin block if line read is the "name: water" header
+			if (line.equals("name: water"))
+			{
+				//set the next two getLine contents, sans prefix, to the property Strings
+				unitCost = this.getLine().replace("unit cost: ", "");
+				
+				try
+				{
+					return new Meter("water", Double.parseDouble(unitCost));
+				}
+				//if constructor Meter() failed, arguments must have been invalid; throw Exception
+				catch (Exception ex)
+				{
+					throw new Exception("Water Meter data invalid in config file.");
+				}
+			}
+		}
+		
+		//if program reaches this point it has not returned a Meter; no valid water Meter defined in file
+		throw new Exception("No valid Water Meter defined in config file.");
+	}
+	
+	//checks whether file is of custom Extension format
+	public boolean checkExtension() throws Exception
+	{
+		//check whether first line is "SAVESTATE", as would be with the custom Extension format
+		boolean isExtensionFormat = this.reader.readLine().equals("SAVESTATE");
+		//reset this.reader to new BufferedReader to return to beginning of file
+		this.reader = new BufferedReader(new FileReader(filename));
+		
+		return isExtensionFormat;
+	}
+	
+	/*
 	 * MAIN
 	 */
 	
@@ -211,10 +369,10 @@ public class ConfigReader
 		try
 		{
 			//create new ConfigReader for the config file
-			ConfigReader cfr = new ConfigReader("Config file.txt");
+			ConfigReader cfr = new ConfigReader("myHouse.txt");
 			
 			//testing single input for getAppliance()
-			cfr.getAppliance("name: Lights;subclass: CyclicFixed;meter: electric;Min units consumed:;Max units consumed:;Fixed units consumed: 6;Probability switched on:;Cycle length: 5/24;");
+			cfr.getAppliance("name: Lights;subclass: CyclicFixed;meter: electric;Min units consumed:;Max units consumed:;Fixed units consumed: 6;Probability switched on:;Cycle length: 5/24;".split(";"));
 			
 			//attempt to getAppliances(), with 2 new Meter objects, from config file
 			cfr.getAppliances(new Meter("electric", 0.013), new Meter("water", 0.002));
@@ -226,6 +384,10 @@ public class ConfigReader
 			{
 				System.out.println(appliance.getClass() + ": " + appliance.getName());
 			}
+			
+			//EXTENSION
+			ConfigReader cfrEx = new ConfigReader("extension.txt");
+			cfrEx.getElectricMeter();
 			
 			//create ConfigReader from invalid file
 			ConfigReader cfr2 = new ConfigReader("nothere.txt");
